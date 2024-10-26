@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+
+MKCERT_VERSION='v1.4.3'
+
+NC='\033[0m'
+GREEN='\033[1;32m'
+RED='\033[1;31m'
+
+# Os detection
+if [[ "$OSTYPE" = "linux-gnu"* ]]; then
+    echo -e "${GREEN}OS detected: Linux.${NC}"
+    BINARY=mkcert-$MKCERT_VERSION-linux-amd64
+
+    echo -e "${GREEN}Update apt repositories.${NC}"
+    sudo apt-get update
+
+    echo -e "${GREEN}Install required dependencies.${NC}"
+    sudo apt install curl libnss3-tools -y
+elif [[ "$OSTYPE" = "darwin"* ]]; then
+    echo -e "${GREEN}OS detected: Mac OSX.${NC}"
+    BINARY=mkcert-$MKCERT_VERSION-darwin-amd64
+else
+    echo -e "${RED}OS detected unsupported: ${OSTYPE}.${NC}"
+    exit 1;
+fi
+
+echo -e "${GREEN}Download mkcert version $MKCERT_VERSION.${NC}"
+curl -sL -o mkcert https://github.com/FiloSottile/mkcert/releases/download/$MKCERT_VERSION/$BINARY
+
+echo -e "${GREEN}Make mkcert executable.${NC}"
+chmod +x mkcert
+
+echo -e "${GREEN}Move mkcert into /usr/local/bin.${NC}"
+sudo mv mkcert /usr/local/bin
+
+echo -e "${GREEN}Install certificate authority to avoid validation error.${NC}"
+mkcert -install

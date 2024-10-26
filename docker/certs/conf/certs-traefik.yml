@@ -1,0 +1,7 @@
+# Traefik custom tls certificates
+# See: https://doc.traefik.io/traefik/https/tls/
+
+tls:
+    certificates:
+        - certFile: /etc/traefik/certs/server.crt
+          keyFile: /etc/traefik/certs/server.key

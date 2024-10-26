@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+NC='\033[0m'
+GREEN='\033[1;32m'
+
+CERT_DIR="./conf/certs"
+CERT_KEY="$CERT_DIR/server.key"
+CERT_CRT="$CERT_DIR/server.crt"
+
+if [ ! -d "$CERT_DIR" ]; then
+    mkdir $CERT_DIR
+elif [ -f "$CERT_KEY" ]; then
+    rm -rf  $CERT_KEY $CERT_CRT
+fi
+
+mkcert -install
+echo -e "${GREEN}Generate certificate for '*.docker.localhost'.${NC}"
+mkcert  -cert-file $CERT_CRT -key-file $CERT_KEY  "*.docker.localhost" 127.0.0.1 ::1
+chmod 400 $CERT_KEY

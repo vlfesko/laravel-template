@@ -1,0 +1,100 @@
+volumes:
+  db_data:
+
+services:
+  db:
+    image: wodby/mariadb:$MARIADB_TAG
+    container_name: "${PROJECT_NAME}-db"
+    stop_grace_period: 30s
+    environment:
+      MYSQL_ROOT_PASSWORD: $DB_ROOT_PASSWORD
+      MYSQL_DATABASE: $DB_DATABASE
+      MYSQL_USER: $DB_USERNAME
+      MYSQL_PASSWORD: $DB_PASSWORD
+    volumes:
+      - db_data:/var/lib/mysql
+
+  app:
+    depends_on:
+      - db
+    environment:
+      APP_TIMEZONE: Europe/Kiev
+      MSMTP_HOST: mailpit
+      MSMTP_PORT: 1025
+      PHP_SENDMAIL_PATH: /usr/bin/msmtp -C /etc/msmtprc -t --read-envelope-from
+
+  cron:
+    environment:
+      APP_TIMEZONE: Europe/Kiev
+      MSMTP_HOST: mailpit
+      MSMTP_PORT: 1025
+      PHP_SENDMAIL_PATH: /usr/bin/msmtp -C /etc/msmtprc -t --read-envelope-from
+
+  web:
+    labels:
+      - "traefik.enable=true"
+      # Serve web over http"
+      - "traefik.http.routers.${PROJECT_NAME}-web-http.rule=Host(`${PROJECT_BASE_URL}`)"
+      - "traefik.http.routers.$PROJECT_NAME-web-http.entrypoints=http"
+      # Serve web over https
+      - "traefik.http.routers.$PROJECT_NAME-web-https.rule=Host(`${PROJECT_BASE_URL}`)"
+      - "traefik.http.routers.$PROJECT_NAME-web-https.entrypoints=https"
+      - "traefik.http.routers.$PROJECT_NAME-web-https.tls=true"
+
+  pma:
+    image: phpmyadmin/phpmyadmin
+    container_name: "${PROJECT_NAME}-pma"
+    environment:
+      PMA_HOST: $DB_HOST
+      PMA_USER: $DB_USERNAME
+      PMA_PASSWORD: $DB_PASSWORD
+      PHP_UPLOAD_MAX_FILESIZE: 1G
+      PHP_MAX_INPUT_VARS: 1G
+    labels:
+      - "traefik.enable=true"
+      # Serve web over http"
+      - "traefik.http.routers.${PROJECT_NAME}-pma-http.rule=Host(`pma.${PROJECT_BASE_URL}`)"
+      - "traefik.http.routers.$PROJECT_NAME-pma-http.entrypoints=http"
+
+  mailpit:
+    image: axllent/mailpit
+    container_name: "${PROJECT_NAME}-mailpit"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.${PROJECT_NAME}-mailpit.loadbalancer.server.port=8025"
+      # Serve web over http"
+      - "traefik.http.routers.${PROJECT_NAME}-mailpit-http.rule=Host(`mailpit.${PROJECT_BASE_URL}`)"
+      - "traefik.http.routers.${PROJECT_NAME}-mailpit-http.entrypoints=http"
+
+  traefik:
+    image: traefik:2.6
+    container_name: "${PROJECT_NAME}-traefik"
+    command:
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--providers.file.directory=/etc/traefik/dynamic"
+      - "--entrypoints.http.address=:80"
+      - "--entrypoints.https.address=:443"
+      - "--accesslog=true"
+      - "--api.insecure=true"
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./docker/certs/conf/middlewares.yml:/etc/traefik/dynamic/middlewares.yml:ro
+      - ./docker/certs/conf/certs-traefik.yml:/etc/traefik/dynamic/certs-traefik.yml:ro
+      - ./docker/certs/conf/certs:/etc/traefik/certs
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.traefik.loadbalancer.server.port=8080"
+      # Serve traefik over http
+      - "traefik.http.routers.traefik-http.rule=Host(`traefik.docker.localhost`)"
+      - "traefik.http.routers.traefik-http.entrypoints=http"
+      # Auto redirection from http to https
+      - "traefik.http.routers.traefik-http.middlewares=https-redirect@file"
+      # Serve traefik over https
+      - "traefik.http.routers.traefik-https.rule=Host(`traefik.docker.localhost`)"
+      - "traefik.http.routers.traefik-https.entrypoints=https"
+      - "traefik.http.routers.traefik-https.tls=true"

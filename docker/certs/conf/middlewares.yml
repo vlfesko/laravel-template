@@ -1,0 +1,10 @@
+# Traefik custom middlewares
+# See: https://doc.traefik.io/traefik/middlewares/overview/
+
+http:
+    middlewares:
+        # upgrade http queries to https with 301 permanent redirection
+        https-redirect:
+            redirectScheme:
+                scheme: https
+                permanent: true

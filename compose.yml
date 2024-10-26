@@ -1,0 +1,45 @@
+services:
+  app:
+    image: wodby/php:$PHP_TAG
+    container_name: "${PROJECT_NAME}-app"
+    env_file:
+      - .env.app
+    volumes:
+      - ./src:/var/www/html:cached
+
+  cron:
+    image: wodby/php:$PHP_TAG
+    container_name: "${PROJECT_NAME}-cron"
+    depends_on:
+      - app
+    env_file:
+      - .env.app
+    volumes:
+      - ./src:/var/www/html:cached
+      - ./docker/conf/cron/crontab:/etc/crontabs/www-data
+    init: true
+    command: sudo -E crond -f -d 0
+
+  node:
+    image: wodby/node:$NODE_TAG
+    container_name: "${PROJECT_NAME}-node"
+    volumes:
+      - ./src:/usr/src/app:cached
+    command: sh -c 'npm install && npm run dev'
+
+  web:
+    image: wodby/nginx:$NGINX_TAG
+    container_name: "${PROJECT_NAME}-web"
+    depends_on:
+      - app
+    environment:
+      NGINX_STATIC_OPEN_FILE_CACHE: "off"
+      NGINX_BACKEND_HOST: app
+      NGINX_VHOST_PRESET: php
+      NGINX_SERVER_ROOT: /var/www/html/public
+    volumes:
+      - ./src:/var/www/html:cached
+
+  redis:
+    image: redis:$REDIS_TAG
+    container_name: "${PROJECT_NAME}-redis"
