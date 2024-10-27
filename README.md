@@ -7,11 +7,11 @@ environment and ensure consistency across different systems. The project is desi
 
 The project is structured as follows:
 
+- `docker`: Docker infrastructure files.
 - `src`: The main source code directory containing the application's PHP files.
+- `.env*` files: Contain environment variables used by the Docker containers.
 - `compose*.yml`: The Docker Compose file that defines the services and their configurations.
 - `Makefile`: The Docker Compose CLI entry point.
-- `.env.example`: A file containing environment variables that are used by the Docker containers, should be copied to `.env` and
-  managed locally.
 
 ## Getting Started
 
@@ -33,12 +33,45 @@ To get started with the project, follow these steps:
 
 1. Clone the repository to your local machine.
 1. Navigate to the project directory in your terminal.
-1. Copy `.env.example` to `.env`.
-1. Copy `src/.env.example` to `src/.env`.
+1. Run `make init` or `make init-dev` to initialize Docker infrastructure.
+1. Edit `.env` file and set `PROJECT_NAME` to your desired project name (`my-app`).
+1. Run `make build` to pull and build Docker images.
 1. Run `make up` to start the Docker containers.
+
+If it is fresh installation, prepare new Laravel application:
+
 1. Run `make shell` to get bash inside PHP container.
-1. Run `composer install --prefer-dist` to install the project's dependencies.
-1. Run `php artisan migrate` to install or update project's database schema. Whenever you need to cleanup database and start from scratch, run `php artisan migrate:fresh` to delete and recreate all tables. If you setting up local environment, to get test data add `--seed` argument to migrate command.
+1. Run `composer global require laravel/installer` to install Laravel installer.
+1. Create new Laravel application and follow installer prompts. At this point the database is ready and migrations can be executed.
+
+   ```
+   laravel new my-app --stack=livewire --jet --api --teams --verification --pest --force
+   ```
+
+1. Move files from `my-app` directory to the project source root and remove `my-app` directory:
+
+   ```
+   mv my-app/* .
+   mv my-app/.* .
+   rm -rf my-app/
+   ```
+
+1. Update `src/vite.config.js`, add `server` section for proper hot module reload support:
+
+   ```
+   export default defineConfig({
+       plugins: [
+          ...
+       ],
+       server: {
+           host: true,
+           hmr: {
+               host: "my-app.docker.localhost"
+           }
+       }
+   });
+
+1. Restart node container `make restart node`  and open your browser at https://my-app.docker.localhost/.
 
 ## Example run
 

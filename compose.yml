@@ -23,6 +23,8 @@ services:
   node:
     image: wodby/node:$NODE_TAG
     container_name: "${PROJECT_NAME}-node"
+    environment:
+      APP_URL: https://$PROJECT_BASE_URL
     volumes:
       - ./src:/usr/src/app:cached
     command: sh -c 'npm install && npm run dev'

@@ -23,8 +23,10 @@ help : Makefile
 build:
 	@echo "Building images $(PROJECT_NAME)..."
 	$(DOCKER_COMPOSE) $(DOCKER_FILES) build
-	@echo "Installing PHP composer packages..."
-	docker run --rm -it -v ./src:/var/www/html:cached wodby/php:$(PHP_TAG) composer install --prefer-dist
+	@if [ -f src/composer.lock ]; then \
+		echo "Installing PHP composer packages..."; \
+		docker run --rm -it -v ./src:/var/www/html:cached wodby/php:$(PHP_TAG) composer install --prefer-dist; \
+	fi
 
 ## pull	:	Pull container images.
 pull:
@@ -45,6 +47,11 @@ down:
 start:
 	@echo "Starting containers for $(PROJECT_NAME) from where you left off..."
 	$(DOCKER_COMPOSE) $(DOCKER_FILES) start
+
+## restart	:	Restart containers without updating.
+restart:
+	@echo "Restarting containers for $(PROJECT_NAME)..."
+	$(DOCKER_COMPOSE) $(DOCKER_FILES) restart $(filter-out $@,$(MAKECMDGOALS))
 
 ## stop	:	Stop containers.
 ##		You can optionally pass an argument with the service name to stop single container
@@ -86,11 +93,11 @@ init:
 	else \
 		echo ".env file already exists. Skipping..."; \
 	fi
-	@if [ ! -f src/.env ]; then \
+	@if [ -d src ] &&  [ ! -f src/.env ]; then \
 		echo "Creating src/.env file from .env.example..."; \
 		cp src/.env.example src/.env; \
 	else \
-		echo "src/.env file already exists. Skipping..."; \
+		echo "src/.env file already exists or src folder is missing. Skipping..."; \
 	fi
 
 ## init	:	Initialize the project by setting up .env, installing mkcert, and generating certificates.
