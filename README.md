@@ -45,7 +45,7 @@ If it is fresh installation, prepare new Laravel application:
 1. Create new Laravel application and follow installer prompts. At this point the database is ready and migrations can be executed.
 
    ```
-   laravel new my-app --stack=livewire --jet --api --teams --verification --pest --force
+   laravel new my-app --stack=livewire --jet --api --teams --verification --pest --force --database=mysql
    ```
 
 1. Move files from `my-app` directory to the project source root and remove `my-app` directory:
@@ -57,19 +57,32 @@ If it is fresh installation, prepare new Laravel application:
    ```
 
 1. Update `src/vite.config.js`, add `server` section for proper hot module reload support:
-
-   ```
-   export default defineConfig({
-       plugins: [
-          ...
-       ],
-       server: {
-           host: true,
-           hmr: {
-               host: "my-app.docker.localhost"
-           }
-       }
-   });
+    
+    ```
+    export default defineConfig(({ command }) => {
+        const config = {
+            plugins: [
+                laravel({
+                    input: [
+                        'resources/css/app.css',
+                        'resources/js/app.js',
+                    ],
+                    refresh: true,
+                }),
+            ],
+            server: {
+                host: true,
+            }
+        };
+    
+        if (command !== 'build') {
+            config.server.hmr = {
+                host: "my-app.docker.localhost"
+            };
+        }
+    
+        return config;
+    });
 
 1. Restart node container `make restart node`  and open your browser at https://my-app.docker.localhost/.
 
