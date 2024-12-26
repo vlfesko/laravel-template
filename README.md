@@ -45,7 +45,7 @@ If it is fresh installation, prepare new Laravel application:
 1. Create new Laravel application and follow installer prompts. At this point the database is ready and migrations can be executed.
 
    ```
-   laravel new my-app --stack=livewire --jet --api --teams --verification --pest --force --database=mysql
+   laravel new my-app --stack=livewire --jet --api --teams --verification --pest --force --database=mariadb
    ```
 
 1. Move files from `my-app` directory to the project source root and remove `my-app` directory:
