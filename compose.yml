@@ -2,6 +2,8 @@ services:
   app:
     image: wodby/php:$PHP_TAG
     container_name: "${PROJECT_NAME}-app"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     env_file:
       - .env.app
     volumes:
@@ -10,6 +12,8 @@ services:
   cron:
     image: wodby/php:$PHP_TAG
     container_name: "${PROJECT_NAME}-cron"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     depends_on:
       - app
     env_file:
@@ -19,6 +23,21 @@ services:
       - ./docker/conf/cron/crontab:/etc/crontabs/www-data
     init: true
     command: sudo -E crond -f -d 0
+
+  worker:
+    image: wodby/php:$PHP_TAG
+    restart: always
+    scale: 3
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      - app
+    env_file:
+      - .env.app
+    volumes:
+      - ./src:/var/www/html:cached
+    init: true
+    command: php artisan queue:listen -v
 
   node:
     image: wodby/node:$NODE_TAG
@@ -37,7 +56,7 @@ services:
     environment:
       NGINX_STATIC_OPEN_FILE_CACHE: "off"
       NGINX_BACKEND_HOST: app
-      NGINX_VHOST_PRESET: php
+      NGINX_VHOST_PRESET: laravel
       NGINX_SERVER_ROOT: /var/www/html/public
     volumes:
       - ./src:/var/www/html:cached
