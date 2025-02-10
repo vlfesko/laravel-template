@@ -31,6 +31,9 @@ services:
       MSMTP_PORT: 1025
       PHP_SENDMAIL_PATH: /usr/bin/msmtp -C /etc/msmtprc -t --read-envelope-from
 
+  worker:
+    restart: no
+
   node:
     ports:
       - "5173:5173"
