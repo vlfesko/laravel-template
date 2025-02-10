@@ -27,7 +27,7 @@ services:
   worker:
     image: wodby/php:$PHP_TAG
     restart: always
-    scale: 3
+    scale: 1
     extra_hosts:
       - "host.docker.internal:host-gateway"
     depends_on:
