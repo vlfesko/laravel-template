@@ -19,11 +19,12 @@ The project is structured as follows:
 
 You must have installed on your system:
 
-1. Docker, [native](https://docs.docker.com/engine/install/) or [OrbStack](https://docs.orbstack.dev/install). On MacOS it is preferable to install OrbStack:
+1. Docker, [native](https://docs.docker.com/engine/install/) or [OrbStack](https://docs.orbstack.dev/install). On MacOS it is
+   preferable to install OrbStack:
     ```
     brew install --cask orbstack
     ```
-   
+
 1. `make`
     ```
     brew install make
@@ -45,10 +46,10 @@ If it is fresh installation, prepare new Laravel application:
 1. Create new Laravel application and follow installer prompts. At this point the database is ready and migrations can be executed.
 
    ```
-   laravel new my-app --stack=livewire --jet --api --teams --verification --pest --force --database=mariadb
+   laravel new my-app --livewire --pest --force --database mariadb
    ```
 
-1. Move files from `my-app` directory to the project source root and remove `my-app` directory:
+1. Move files from `my-app` directory to the project source root and remove `my-app` directory (inside the app container in the shell):
 
    ```
    mv my-app/* .
@@ -57,34 +58,37 @@ If it is fresh installation, prepare new Laravel application:
    ```
 
 1. Update `src/vite.config.js`, add `server` section for proper hot module reload support:
-    
-    ```
-    export default defineConfig(({ command }) => {
-        const config = {
-            plugins: [
-                laravel({
-                    input: [
-                        'resources/css/app.css',
-                        'resources/js/app.js',
-                    ],
-                    refresh: true,
-                }),
-            ],
-            server: {
-                host: true,
-            }
-        };
-    
-        if (command !== 'build') {
-            config.server.hmr = {
-                host: "my-app.docker.localhost"
-            };
-        }
-    
-        return config;
-    });
 
-1. Restart node container `make restart node`  and open your browser at https://my-app.docker.localhost/.
+    ```
+   import { defineConfig } from 'vite';
+   import laravel from 'laravel-vite-plugin';
+   import tailwindcss from "@tailwindcss/vite";
+   
+   export default defineConfig(({ command }) => {
+       const config = {
+           plugins: [
+               laravel({
+                   input: ['resources/css/app.css', 'resources/js/app.js'],
+                   refresh: [`resources/views/**/*`],
+               }),
+               tailwindcss(),
+           ],
+           server: {
+               cors: true,
+               host: true,
+           },
+       };
+   
+       if (command !== 'build') {
+           config.server.hmr = {
+               host: "my-app.docker.localhost"
+           };
+       }
+   
+       return config;
+   });
+
+1. Restart node container `make restart node`  and open your browser at https://my-app.docker.localhost/ and make sure it has no errors (run `make logs node` to check).
 
 ## Example run
 

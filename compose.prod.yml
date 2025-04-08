@@ -1,17 +1,14 @@
 services:
   app:
-    environment:
-      APP_ENV: production
-      APP_DEBUG: false
-      APP_TIMEZONE: Europe/Berlin
+    env_file:
+      - .env.app
+      - .env.app.prod
 
   cron:
-    environment:
-      APP_ENV: production
-      APP_DEBUG: false
-      APP_TIMEZONE: Europe/Berlin
+    env_file:
+      - .env.app
+      - .env.app.prod
 
-  web:
-    ports:
-      - "127.0.0.1:8086:80"
-    labels: !reset []
+#  web:
+#    ports:
+#      - "127.0.0.1:80:80"

@@ -19,20 +19,20 @@ services:
     depends_on:
       - db
     environment:
-      APP_TIMEZONE: Europe/Kiev
       MSMTP_HOST: mailpit
       MSMTP_PORT: 1025
       PHP_SENDMAIL_PATH: /usr/bin/msmtp -C /etc/msmtprc -t --read-envelope-from
 
   cron:
+    depends_on:
+      - db
     environment:
-      APP_TIMEZONE: Europe/Kiev
       MSMTP_HOST: mailpit
       MSMTP_PORT: 1025
       PHP_SENDMAIL_PATH: /usr/bin/msmtp -C /etc/msmtprc -t --read-envelope-from
 
   worker:
-    restart: no
+    restart: unless-stopped
 
   node:
     ports:
