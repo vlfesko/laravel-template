@@ -95,6 +95,9 @@ If it is fresh installation, prepare new Laravel application:
 - Run `make shell` to get bash inside PHP container.
 - `composer require barryvdh/laravel-debugbar --dev`
 - `composer require spatie/laravel-ray`
+  - Then, publish configuration file for Docker
+  - `php artisan ray:publish-config --docker`
+  - Adjust the local path to project sources in `.env:RAY_LOCAL_PATH` value
 - `composer require -W --dev laravel-shift/blueprint`
 - `composer require --dev jasonmccreary/laravel-test-assertions`
 
