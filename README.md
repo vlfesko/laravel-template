@@ -95,6 +95,8 @@ If it is fresh installation, prepare new Laravel application:
 - Run `make shell` to get bash inside PHP container.
 - `composer require barryvdh/laravel-debugbar --dev`
 - `composer require spatie/laravel-ray`
+- `composer require -W --dev laravel-shift/blueprint`
+- `composer require --dev jasonmccreary/laravel-test-assertions`
 
 ## Example run
 
