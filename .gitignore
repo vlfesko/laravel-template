@@ -1,2 +1,4 @@
 /.env
 /docker/data/*
+/src/draft.yaml
+/src/.blueprint
