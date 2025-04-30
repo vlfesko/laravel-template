@@ -42,10 +42,10 @@ services:
     labels:
       - "traefik.enable=true"
       # Serve web over http"
-      - "traefik.http.routers.${PROJECT_NAME}-web-http.rule=Host(`${PROJECT_BASE_URL}`)"
+      - "traefik.http.routers.${PROJECT_NAME}-web-http.rule=Host(`${APP_DOMAIN}`)"
       - "traefik.http.routers.$PROJECT_NAME-web-http.entrypoints=http"
       # Serve web over https
-      - "traefik.http.routers.$PROJECT_NAME-web-https.rule=Host(`${PROJECT_BASE_URL}`)"
+      - "traefik.http.routers.$PROJECT_NAME-web-https.rule=Host(`${APP_DOMAIN}`)"
       - "traefik.http.routers.$PROJECT_NAME-web-https.entrypoints=https"
       - "traefik.http.routers.$PROJECT_NAME-web-https.tls=true"
 
@@ -61,7 +61,7 @@ services:
     labels:
       - "traefik.enable=true"
       # Serve web over http"
-      - "traefik.http.routers.${PROJECT_NAME}-pma-http.rule=Host(`pma.${PROJECT_BASE_URL}`)"
+      - "traefik.http.routers.${PROJECT_NAME}-pma-http.rule=Host(`pma.${APP_DOMAIN}`)"
       - "traefik.http.routers.$PROJECT_NAME-pma-http.entrypoints=http"
 
   mailpit:
@@ -71,7 +71,7 @@ services:
       - "traefik.enable=true"
       - "traefik.http.services.${PROJECT_NAME}-mailpit.loadbalancer.server.port=8025"
       # Serve web over http"
-      - "traefik.http.routers.${PROJECT_NAME}-mailpit-http.rule=Host(`mailpit.${PROJECT_BASE_URL}`)"
+      - "traefik.http.routers.${PROJECT_NAME}-mailpit-http.rule=Host(`mailpit.${APP_DOMAIN}`)"
       - "traefik.http.routers.${PROJECT_NAME}-mailpit-http.entrypoints=http"
 
   traefik:

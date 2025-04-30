@@ -35,7 +35,7 @@ To get started with the project, follow these steps:
 1. Clone the repository to your local machine.
 1. Navigate to the project directory in your terminal.
 1. Run `make init` or `make init-dev` to initialize Docker infrastructure.
-1. Edit `.env` file and set `PROJECT_NAME` to your desired project name (`my-app`).
+1. Edit `.env` file and set `PROJECT_NAME` to your desired project name (`my-app`), as well as uncomment needed PHP tag for either Linux (under `# Linux (uid 1000 gid 1000)` section) or Mac (`# macOS (uid 501 gid 20)`). By default it is for Mac.
 1. Run `make build` to pull and build Docker images.
 1. Run `make up` to start the Docker containers.
 
@@ -46,7 +46,7 @@ If it is fresh installation, prepare new Laravel application:
 1. Create new Laravel application and follow installer prompts. At this point the database is ready and migrations can be executed.
 
    ```
-   laravel new my-app --livewire --pest --force --database mariadb
+   laravel new my-app --livewire --pest --force --database mariadb --no-interaction
    ```
 
 1. Move files from `my-app` directory to the project source root and remove `my-app` directory (inside the app container in the shell):
@@ -57,7 +57,7 @@ If it is fresh installation, prepare new Laravel application:
    rm -rf my-app/
    ```
 
-1. Update `src/vite.config.js`, add `server` section for proper hot module reload support:
+1. Update `src/vite.config.js`, add `server` section for proper hot module reload support, replace `my-app.docker.localhost` with the actual app domain:
 
     ```
    import { defineConfig } from 'vite';
@@ -88,7 +88,13 @@ If it is fresh installation, prepare new Laravel application:
        return config;
    });
 
-1. Restart node container `make restart node`  and open your browser at https://my-app.docker.localhost/ and make sure it has no errors (run `make logs node` to check).
+1. Exit app container shell, restart node container `make restart node`, run `make logs node` and open your browser at APP_URL displayed in the container, make sure it has no errors.
+
+## Install additional components
+
+- Run `make shell` to get bash inside PHP container.
+- `composer require barryvdh/laravel-debugbar --dev`
+- `composer require spatie/laravel-ray`
 
 ## Example run
 

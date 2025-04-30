@@ -1,13 +1,15 @@
 services:
   app:
     env_file:
+      - .env
       - .env.app
-      - .env.app.prod
+      - .env.app.production
 
   cron:
     env_file:
+      - .env
       - .env.app
-      - .env.app.prod
+      - .env.app.production
 
 #  web:
 #    ports:

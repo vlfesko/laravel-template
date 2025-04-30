@@ -5,6 +5,7 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     env_file:
+      - .env
       - .env.app
     volumes:
       - ./src:/var/www/html:cached
@@ -17,6 +18,7 @@ services:
     depends_on:
       - app
     env_file:
+      - .env
       - .env.app
     volumes:
       - ./src:/var/www/html:cached
@@ -33,6 +35,7 @@ services:
     depends_on:
       - app
     env_file:
+      - .env
       - .env.app
     volumes:
       - ./src:/var/www/html:cached
@@ -43,7 +46,7 @@ services:
     image: wodby/node:$NODE_TAG
     container_name: "${PROJECT_NAME}-node"
     environment:
-      APP_URL: https://$PROJECT_BASE_URL
+      APP_URL: $APP_URL
     volumes:
       - ./src:/usr/src/app:cached
     command: sh -c 'npm install && npm run dev'
