@@ -98,6 +98,7 @@ If it is fresh installation, prepare new Laravel application:
   - Then, publish configuration file for Docker
   - `php artisan ray:publish-config --docker`
   - Adjust the local path to project sources in `.env:RAY_LOCAL_PATH` value
+  - On Linux, allow port `23517` with `ufw` (e.g. `sudo ufw allow 23517/tcp` or `sudo ufw allow from 172.30.0.0/16 to 172.17.0.1 port 23517 proto tcp` where `172.30.0.0/16` is a container network and `172.17.0.1` is a docker host gateway)
 - `composer require -W --dev laravel-shift/blueprint`
 - `composer require --dev jasonmccreary/laravel-test-assertions`
 
