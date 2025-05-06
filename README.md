@@ -35,7 +35,8 @@ To get started with the project, follow these steps:
 1. Clone the repository to your local machine.
 1. Navigate to the project directory in your terminal.
 1. Run `make init` or `make init-dev` to initialize Docker infrastructure.
-1. Edit `.env` file and set `PROJECT_NAME` to your desired project name (`my-app`), as well as uncomment needed PHP tag for either Linux (under `# Linux (uid 1000 gid 1000)` section) or Mac (`# macOS (uid 501 gid 20)`). By default it is for Mac.
+1. Edit `.env` file and set `PROJECT_NAME` to your desired project name (`my-app`), as well as uncomment needed PHP tag for either
+   Linux (under `# Linux (uid 1000 gid 1000)` section) or Mac (`# macOS (uid 501 gid 20)`). By default it is for Mac.
 1. Run `make build` to pull and build Docker images.
 1. Run `make up` to start the Docker containers.
 
@@ -57,7 +58,8 @@ If it is fresh installation, prepare new Laravel application:
    rm -rf my-app/
    ```
 
-1. Update `src/vite.config.js`, add `server` section for proper hot module reload support, replace `my-app.docker.localhost` with the actual app domain:
+1. Update `src/vite.config.js`, add `server` section for proper hot module reload support, replace `my-app.docker.localhost` with the
+   actual app domain:
 
     ```
    import { defineConfig } from 'vite';
@@ -88,19 +90,22 @@ If it is fresh installation, prepare new Laravel application:
        return config;
    });
 
-1. Exit app container shell, restart node container `make restart node`, run `make logs node` and open your browser at APP_URL displayed in the container, make sure it has no errors.
+1. Exit app container shell, restart node container `make restart node`, run `make logs node` and open your browser at APP_URL
+   displayed in the container, make sure it has no errors.
 
 ## Install additional components
 
-- Run `make shell` to get bash inside PHP container.
-- `composer require barryvdh/laravel-debugbar --dev`
-- `composer require spatie/laravel-ray`
-  - Then, publish configuration file for Docker
-  - `php artisan ray:publish-config --docker`
-  - Adjust the local path to project sources in `.env:RAY_LOCAL_PATH` value
-  - On Linux, allow port `23517` with `ufw` (e.g. `sudo ufw allow 23517/tcp` or `sudo ufw allow from 172.30.0.0/16 to 172.17.0.1 port 23517 proto tcp` where `172.30.0.0/16` is a container network and `172.17.0.1` is a docker host gateway)
-- `composer require -W --dev laravel-shift/blueprint`
-- `composer require --dev jasonmccreary/laravel-test-assertions`
+- Run `make post-create` to install additional composer packages and run setup commands. It will install:
+    - `laravel-shift/blueprint`
+    - `larastan/larastan`
+    - `barryvdh/laravel-debugbar`
+    - `vlfesko/laravel-pint-config`
+    - `spatie/laravel-ray`
+- If using Spatie Ray:
+    - Adjust the local path to project sources in `.env:RAY_LOCAL_PATH` value
+    - On Linux, allow port `23517` with `ufw` (e.g. `sudo ufw allow 23517/tcp` or
+      `sudo ufw allow from 172.30.0.0/16 to 172.17.0.1 port 23517 proto tcp` where `172.30.0.0/16` is a container network and
+      `172.17.0.1` is a docker host gateway)
 
 ## Example run
 
