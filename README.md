@@ -90,8 +90,8 @@ If it is fresh installation, prepare new Laravel application:
        return config;
    });
 
-1. Exit app container shell, restart node container `make restart node`, run `make logs node` and open your browser at APP_URL
-   displayed in the container, make sure it has no errors.
+1. Exit app container shell, restart node container `make restart node`, run `make logs node` and open your browser at
+   `APP_URL` displayed in the container, make sure it has no errors.
 
 ## Install additional components
 
@@ -102,10 +102,10 @@ If it is fresh installation, prepare new Laravel application:
     - `vlfesko/laravel-pint-config`
     - `spatie/laravel-ray`
 - If using Spatie Ray:
-    - Adjust the local path to project sources in `.env:RAY_LOCAL_PATH` value
+    - Adjust the local path to project sources in `.env:RAY_LOCAL_PATH` value.
     - On Linux, allow port `23517` with `ufw` (e.g. `sudo ufw allow 23517/tcp` or
       `sudo ufw allow from 172.30.0.0/16 to 172.17.0.1 port 23517 proto tcp` where `172.30.0.0/16` is a container network and
-      `172.17.0.1` is a docker host gateway)
+      `172.17.0.1` is a docker host gateway).
 
 ## Example run
 
@@ -114,3 +114,12 @@ If it is fresh installation, prepare new Laravel application:
 ## Log files
 
 Logs are written to files under `src/storage/logs`.
+
+## Using Laravel Pint with PHPStorm
+
+- Add PHP CLI Interpreter, not necessary visible only for this project, it must be as close as possible PHP version image e.g.
+  `wodby/php:8.3-dev-macos-4.56.3`, using Docker server or make sure to add OrbStack server for Mac.
+- In PHP Quality Tools settings select Laravel Pint. It must indicate Pint version and status OK.
+- In PHP Quality Tools > Laravel Pint settings enable Laravel Pint inspection, add configuration with the CLI Interpreter, set path to pint.json as
+  `/opt/project/src/vendor/vlfesko/laravel-pint-config/pint.json` (as the project root will be mounted under
+  `/opt/project` directory in the CLI Interpreter Docker image), select preset `laravel`.
