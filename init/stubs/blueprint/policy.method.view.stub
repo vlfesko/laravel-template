@@ -1,0 +1,4 @@
+    public function view(User $user, {{ modelClass }} ${{ modelVariable }}): bool
+    {
+        //
+    }

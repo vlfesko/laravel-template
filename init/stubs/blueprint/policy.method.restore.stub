@@ -1,0 +1,4 @@
+    public function restore(User $user, {{ modelClass }} ${{ modelVariable }}): bool
+    {
+        //
+    }

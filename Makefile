@@ -130,6 +130,8 @@ post-create:
 	@if [ ! -f src/phpstan.neon.dist ]; then \
 		echo "Copy larastan config..."; \
 		cp init/phpstan.neon.dist src; \
+		echo "Copy blueprint stubs..."; \
+		cp -r init/stubs src; \
 	fi
 
 # https://stackoverflow.com/a/6273809/1826109

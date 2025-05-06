@@ -1,0 +1,4 @@
+    public function update(User $user, {{ modelClass }} ${{ modelVariable }}): bool
+    {
+        //
+    }

@@ -1,0 +1,4 @@
+    public function forceDelete(User $user, {{ modelClass }} ${{ modelVariable }}): bool
+    {
+        //
+    }

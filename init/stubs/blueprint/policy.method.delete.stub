@@ -1,0 +1,4 @@
+    public function delete(User $user, {{ modelClass }} ${{ modelVariable }}): bool
+    {
+        //
+    }
