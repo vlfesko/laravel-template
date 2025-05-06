@@ -9,7 +9,7 @@ SHELL := /bin/bash
 UNAME := $(shell uname -sm)
 DOCKER_COMPOSE := docker compose
 COMPOSE_FILES := -f compose.yml -f compose.$(COMPOSE_ENV).yml
-DOCKER_COMPOSE_W_FILES := $(DOCKER_COMPOSE) $(COMPOSE_FILES)
+DOCKER_COMPOSE_W_FILES = $(DOCKER_COMPOSE) $(COMPOSE_FILES)
 PINT_FILE := vendor/vlfesko/laravel-pint-config/pint.json
 
 ifeq ($(UNAME),Darwin arm64)
