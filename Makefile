@@ -1,7 +1,7 @@
 include .env.example
 -include .env
 
-.PHONY: up down stop prune ps shell logs
+.PHONY: help build pull up down start restart stop prune ps shell logs pint init init-dev post-create
 
 default: up
 

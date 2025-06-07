@@ -2,20 +2,20 @@ services:
   app:
     image: wodby/php:$PHP_TAG
     container_name: "${PROJECT_NAME}-app"
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+    restart: on-failure:5
     env_file:
       - .env
       - .env.app
     volumes:
       - ./docker/conf/php/bashrc:/home/wodby/.bashrc
       - ./src:/var/www/html:cached
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
   cron:
     image: wodby/php:$PHP_TAG
     container_name: "${PROJECT_NAME}-cron"
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+    restart: on-failure:5
     depends_on:
       - app
     env_file:
@@ -26,13 +26,13 @@ services:
       - ./docker/conf/cron/crontab:/etc/crontabs/www-data
     init: true
     command: sudo -E crond -f -d 0
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
   worker:
     image: wodby/php:$PHP_TAG
-    restart: always
+    restart: on-failure:5
     scale: 1
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
     depends_on:
       - app
     env_file:
@@ -42,10 +42,13 @@ services:
       - ./src:/var/www/html:cached
     init: true
     command: php artisan queue:listen -v
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
   node:
     image: wodby/node:$NODE_TAG
     container_name: "${PROJECT_NAME}-node"
+    restart: on-failure:5
     environment:
       APP_URL: $APP_URL
     volumes:
@@ -55,6 +58,7 @@ services:
   web:
     image: wodby/nginx:$NGINX_TAG
     container_name: "${PROJECT_NAME}-web"
+    restart: on-failure:5
     depends_on:
       - app
     environment:
@@ -68,3 +72,4 @@ services:
   redis:
     image: redis:$REDIS_TAG
     container_name: "${PROJECT_NAME}-redis"
+    restart: on-failure:5

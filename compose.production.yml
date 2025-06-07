@@ -1,16 +1,29 @@
 services:
   app:
+    restart: unless-stopped
     env_file:
       - .env
       - .env.app
       - .env.app.production
 
   cron:
+    restart: unless-stopped
     env_file:
       - .env
       - .env.app
       - .env.app.production
 
-#  web:
+  worker:
+    restart: unless-stopped
+
+  node:
+    restart: unless-stopped
+
+  web:
+    restart: unless-stopped
 #    ports:
 #      - "127.0.0.1:80:80"
+#    labels: !reset []
+
+  redis:
+    restart: unless-stopped
