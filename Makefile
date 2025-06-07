@@ -1,7 +1,7 @@
 include .env.example
 -include .env
 
-.PHONY: help build pull up down start restart stop prune ps shell logs pint init init-dev post-create
+.PHONY: help build pull up down start restart stop prune ps shell logs pint artisan composer init init-dev post-create
 
 default: up
 
@@ -86,6 +86,20 @@ logs:
 ## pint	:	Run Laravel Pint to reformat the app code.
 pint:
 	$(DOCKER_COMPOSE) exec app php vendor/bin/pint --config $(PINT_FILE)
+
+## artisan	:	Run Laravel Artisan commands.
+##		You can pass arguments to artisan
+##		artisan migrate	: Run migrations.
+##		artisan make:model Post	: Create a Post model.
+artisan:
+	$(DOCKER_COMPOSE) exec app php artisan $(filter-out $@,$(MAKECMDGOALS))
+
+## composer	:	Run Composer commands.
+##		You can pass arguments to composer
+##		composer install	: Install dependencies.
+##		composer require spatie/laravel-ray	: Require a package.
+composer:
+	$(DOCKER_COMPOSE) exec app composer $(filter-out $@,$(MAKECMDGOALS))
 
 ## init	:	Initialize the project by setting up .env files.
 init:
