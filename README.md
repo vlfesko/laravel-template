@@ -5,6 +5,8 @@
 ![Docker](https://img.shields.io/badge/Docker-Compose-blue.svg)
 ![Wodby](https://img.shields.io/badge/Wodby-2.1.4-green.svg)
 
+*Last updated: August 3, 2025*
+
 This project is a PHP application built using the Laravel framework. It utilizes Docker containers based on the **Wodby Docker Stack v2.1.4** to manage the development environment and ensure consistency across different systems. The project is designed to be portable and easy to set up.
 
 ## Table of Contents
@@ -27,7 +29,7 @@ This Laravel template is built on:
 - **PHP**: 8.3 (configurable for 8.1, 8.2, 8.4)
 - **Laravel**: 12.x
 - **Database**: MariaDB 11.4
-- **Web Server**: Nginx 1.28
+- **Web Server**: Nginx 1.29
 - **Cache**: Redis 7.4
 - **Node.js**: 22 (for asset compilation)
 
@@ -236,10 +238,10 @@ make prune        # Clean up Docker system
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| `PHP_TAG` | PHP version tag | `8.3-dev-macos-4.56.7` |
-| `NGINX_TAG` | Nginx version tag | `1.28-5.42.0` |
-| `MARIADB_TAG` | MariaDB version tag | `11.4-3.31.0` |
-| `NODE_TAG` | Node.js version tag | `22-dev-1.50.0` |
+| `PHP_TAG` | PHP version tag | `8.3-dev-macos-4.59.2` |
+| `NGINX_TAG` | Nginx version tag | `1.29-5.44.2` |
+| `MARIADB_TAG` | MariaDB version tag | `11.4-3.32.2` |
+| `NODE_TAG` | Node.js version tag | `22-dev-1.52.4` |
 | `REDIS_TAG` | Redis version tag | `7.4.3-alpine` |
 
 ### Optional Variables
@@ -406,13 +408,14 @@ If using Spatie Ray for debugging:
 ## Using Laravel Pint with PHPStorm
 
 1. **Add PHP CLI Interpreter** using Docker:
-   - Use image: `wodby/php:8.3-dev-macos-4.56.7`
+   - Use image: `wodby/php:8.3-dev-macos-4.59.2`
    - Configure Docker server (OrbStack for macOS)
 
 2. **Configure Laravel Pint**:
    - Enable Laravel Pint inspection in PHP Quality Tools
    - Set configuration path: `/opt/project/src/vendor/vlfesko/laravel-pint-config/pint.json`
    - Select preset: `laravel`
+   - Last updated: August 2025
 
 ## Troubleshooting
 

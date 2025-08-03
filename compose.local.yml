@@ -5,6 +5,7 @@ services:
   db:
     image: wodby/mariadb:$MARIADB_TAG
     container_name: "${PROJECT_NAME}-db"
+    restart: on-failure:5
     stop_grace_period: 30s
     environment:
       MYSQL_ROOT_PASSWORD: $DB_ROOT_PASSWORD
@@ -31,9 +32,6 @@ services:
       MSMTP_PORT: 1025
       PHP_SENDMAIL_PATH: /usr/bin/msmtp -C /etc/msmtprc -t --read-envelope-from
 
-  worker:
-    restart: unless-stopped
-
   node:
     ports:
       - "5173:5173"
@@ -52,6 +50,7 @@ services:
   pma:
     image: phpmyadmin/phpmyadmin
     container_name: "${PROJECT_NAME}-pma"
+    restart: on-failure:5
     environment:
       PMA_HOST: $DB_HOST
       PMA_USER: $DB_USERNAME
@@ -67,6 +66,7 @@ services:
   mailpit:
     image: axllent/mailpit
     container_name: "${PROJECT_NAME}-mailpit"
+    restart: on-failure:5
     labels:
       - "traefik.enable=true"
       - "traefik.http.services.${PROJECT_NAME}-mailpit.loadbalancer.server.port=8025"
@@ -77,6 +77,7 @@ services:
   traefik:
     image: traefik:2.6
     container_name: "${PROJECT_NAME}-traefik"
+    restart: on-failure:5
     command:
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
