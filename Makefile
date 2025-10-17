@@ -21,7 +21,7 @@ endif
 help : Makefile
 	@sed -n 's/^##//p' $<
 
-## build	:	Build PHP image with Node.js.
+## build	:	Build docker compose images.
 build:
 	@echo "Building images $(PROJECT_NAME)..."
 	$(DOCKER_COMPOSE_W_FILES) build

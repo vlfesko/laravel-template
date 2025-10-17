@@ -2,7 +2,6 @@ services:
   app:
     image: wodby/php:$PHP_TAG
     container_name: "${PROJECT_NAME}-app"
-    restart: on-failure:5
     env_file:
       - .env
       - .env.app
@@ -15,7 +14,6 @@ services:
   cron:
     image: wodby/php:$PHP_TAG
     container_name: "${PROJECT_NAME}-cron"
-    restart: on-failure:5
     depends_on:
       - app
     env_file:
@@ -31,7 +29,6 @@ services:
 
   worker:
     image: wodby/php:$PHP_TAG
-    restart: on-failure:5
     scale: 1
     depends_on:
       - app
@@ -48,7 +45,6 @@ services:
   node:
     image: wodby/node:$NODE_TAG
     container_name: "${PROJECT_NAME}-node"
-    restart: on-failure:5
     environment:
       APP_URL: $APP_URL
     volumes:
@@ -58,7 +54,6 @@ services:
   web:
     image: wodby/nginx:$NGINX_TAG
     container_name: "${PROJECT_NAME}-web"
-    restart: on-failure:5
     depends_on:
       - app
     environment:
@@ -72,4 +67,3 @@ services:
   redis:
     image: redis:$REDIS_TAG
     container_name: "${PROJECT_NAME}-redis"
-    restart: on-failure:5
