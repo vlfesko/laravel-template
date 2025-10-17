@@ -3,11 +3,11 @@
 ![Laravel](https://img.shields.io/badge/Laravel-12.x-red.svg)
 ![PHP](https://img.shields.io/badge/PHP-8.3-blue.svg)
 ![Docker](https://img.shields.io/badge/Docker-Compose-blue.svg)
-![Wodby](https://img.shields.io/badge/Wodby-2.1.4-green.svg)
+![Wodby](https://img.shields.io/badge/Wodby-2.1.9-green.svg)
 
-*Last updated: August 3, 2025*
+*Last updated: October 17, 2025*
 
-This project is a PHP application built using the Laravel framework. It utilizes Docker containers based on the **Wodby Docker Stack v2.1.4** to manage the development environment and ensure consistency across different systems. The project is designed to be portable and easy to set up.
+This project is a PHP application built using the Laravel framework. It utilizes Docker containers based on the **Wodby Docker Stack v2.1.9** to manage the development environment and ensure consistency across different systems. The project is designed to be portable and easy to set up.
 
 ## Table of Contents
 
@@ -25,13 +25,13 @@ This project is a PHP application built using the Laravel framework. It utilizes
 ## Environment Information
 
 This Laravel template is built on:
-- **Wodby Docker Stack**: v2.1.4
+- **Wodby Docker Stack**: v2.1.9
 - **PHP**: 8.3 (configurable for 8.1, 8.2, 8.4)
 - **Laravel**: 12.x
 - **Database**: MariaDB 11.4
 - **Web Server**: Nginx 1.29
 - **Cache**: Redis 7.4
-- **Node.js**: 22 (for asset compilation)
+- **Node.js**: 24 (for asset compilation)
 
 ## Docker Services
 
@@ -198,27 +198,32 @@ The project uses a Makefile for common Docker operations:
 
 ### Container Management
 ```bash
-make init          # Initialize Docker infrastructure
-make init-dev      # Initialize for development
-make build         # Build/pull Docker images
-make up           # Start all services
-make down         # Stop all services
-make restart      # Restart all services
-make restart <service>  # Restart specific service
+make init                  # Initialize Docker infrastructure
+make init-dev              # Initialize for development with mkcert and SSL
+make build                 # Build Docker compose images
+make pull                  # Pull container images
+make up                    # Start all containers (default command)
+make down                  # Stop all containers
+make start                 # Start containers without updating
+make restart               # Restart all containers
+make restart <service>     # Restart specific service
+make stop                  # Stop all containers
+make stop <service>        # Stop specific service
+make prune                 # Remove containers and their volumes
+make prune <service>       # Remove specific container and its volumes
+make ps                    # List running containers
 ```
 
 ### Development Tools
 ```bash
-make shell        # Access PHP container bash
-make shell-root   # Access PHP container as root
-make logs         # View all container logs
-make logs <service>  # View specific service logs
-make ps           # Show running containers
-```
-
-### Cleanup
-```bash
-make prune        # Clean up Docker system
+make shell                 # Access app container via bash
+make shell <service>       # Access specific container via bash
+make logs                  # View all container logs
+make logs <service>        # View specific service logs
+make artisan <command>     # Run Laravel Artisan commands
+make composer <command>    # Run Composer commands
+make pint                  # Run Laravel Pint to format code
+make post-create           # Install additional dev packages
 ```
 
 ## Environment Variables
@@ -238,10 +243,10 @@ make prune        # Clean up Docker system
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| `PHP_TAG` | PHP version tag | `8.3-dev-macos-4.59.2` |
-| `NGINX_TAG` | Nginx version tag | `1.29-5.44.2` |
-| `MARIADB_TAG` | MariaDB version tag | `11.4-3.32.2` |
-| `NODE_TAG` | Node.js version tag | `22-dev-1.52.4` |
+| `PHP_TAG` | PHP version tag | `8.3-dev-macos-4.60.1` |
+| `NGINX_TAG` | Nginx version tag | `1.29-5.44.4` |
+| `MARIADB_TAG` | MariaDB version tag | `11.4-3.32.3` |
+| `NODE_TAG` | Node.js version tag | `24-dev-1.55.0` |
 | `REDIS_TAG` | Redis version tag | `7.4.3-alpine` |
 
 ### Optional Variables
@@ -347,51 +352,78 @@ The template includes Traefik with SSL support:
 
 ```
 laravel-template/
-├── docker/                    # Docker infrastructure
-│   ├── certs/                # SSL certificates and Traefik config
-│   ├── conf/                 # Service configurations
+├── .claude/                 # Claude Code configuration (optional)
+│   └── commands/            # Custom slash commands
+├── docker/                  # Docker infrastructure
+│   ├── certs/               # SSL certificates and Traefik config
+│   ├── conf/                # Service configurations
 │   │   ├── cron/            # Crontab configuration
 │   │   └── php/             # PHP/Bash configuration
 │   └── data/                # Persistent data storage
 ├── docker4php/              # Wodby stack reference
 ├── init/                    # Initialization scripts and stubs
+│   ├── stubs/               # Blueprint code generation stubs
+│   ├── phpstan.neon.dist    # PHPStan configuration template
+│   └── .env.*               # Environment file templates
 ├── src/                     # Laravel application source
 │   ├── app/                 # Laravel app directory
+│   ├── bootstrap/           # Framework bootstrap files
 │   ├── config/              # Configuration files
 │   ├── database/            # Migrations, factories, seeders
 │   ├── public/              # Web root
 │   ├── resources/           # Views, assets, lang files
 │   ├── routes/              # Route definitions
 │   ├── storage/             # Logs, cache, uploads
-│   └── tests/               # Test files
-├── .env                     # Environment variables
-├── .env.example             # Environment template
-├── .env.app                 # App-specific variables
-├── .env.app.production      # Production variables
+│   ├── tests/               # Test files
+│   ├── .env                 # Laravel environment config
+│   ├── .env.example         # Laravel environment template
+│   ├── artisan              # Artisan CLI script
+│   ├── composer.json        # PHP dependencies
+│   ├── composer.lock        # Locked dependency versions
+│   ├── package.json         # Node.js dependencies
+│   ├── package-lock.json    # Locked Node.js versions
+│   ├── phpstan.neon.dist    # PHPStan static analysis config
+│   └── vite.config.js       # Vite build configuration
+├── .env                     # Docker environment variables
+├── .env.example             # Docker environment template
+├── .env.app                 # App-specific Docker variables
+├── .env.app.production      # Production Docker variables
+├── .gitignore               # Git ignore rules
+├── CLAUDE.md                # Claude Code project instructions
 ├── compose.yml              # Base Docker services
 ├── compose.local.yml        # Local development overrides
+├── compose.local.arm64v8.yml # ARM64 Mac overrides
 ├── compose.production.yml   # Production overrides
 ├── Makefile                 # Docker command shortcuts
-└── README.md               # This file
+└── README.md                # This file
 ```
 
 ### Key Configuration Files
 
-- **`.env*`**: Environment variables for different contexts
-- **`compose*.yml`**: Docker service definitions
-- **`Makefile`**: Convenient command shortcuts
-- **`docker/conf/`**: Service-specific configurations
-- **`src/`**: Standard Laravel application structure
+- **`.env` (root)**: Docker environment variables (PROJECT_NAME, service tags, etc.)
+- **`.env.app`**: App-specific Docker variables (sourced by compose files)
+- **`src/.env`**: Laravel application environment (database, cache, mail, etc.)
+- **`compose*.yml`**: Docker service definitions for different environments
+- **`Makefile`**: Convenient command shortcuts for Docker operations
+- **`CLAUDE.md`**: Project-specific instructions for Claude Code AI assistant
+- **`docker/conf/`**: Service-specific configurations (cron, PHP, Nginx)
+- **`init/`**: Setup scripts and template files for project initialization
+- **`src/composer.json`**: PHP dependencies and scripts
+- **`src/package.json`**: Node.js dependencies and build scripts
+- **`src/vite.config.js`**: Asset compilation and HMR configuration
 
 ## Install Additional Components
 
 Run `make post-create` to install additional composer packages and run setup commands. It will install:
 
 - **`laravel-shift/blueprint`**: Database modeling and code generation
+- **`jasonmccreary/laravel-test-assertions`**: Additional test assertions
 - **`larastan/larastan`**: Static analysis for Laravel
 - **`barryvdh/laravel-debugbar`**: Debug toolbar for development
 - **`vlfesko/laravel-pint-config`**: Code style configuration
 - **`spatie/laravel-ray`**: Advanced debugging tool
+
+This command also copies the PHPStan configuration and Blueprint stubs to the `src` directory.
 
 ### Spatie Ray Setup
 
@@ -408,14 +440,14 @@ If using Spatie Ray for debugging:
 ## Using Laravel Pint with PHPStorm
 
 1. **Add PHP CLI Interpreter** using Docker:
-   - Use image: `wodby/php:8.3-dev-macos-4.59.2`
+   - Use image: `wodby/php:8.3-dev-macos-4.60.1`
    - Configure Docker server (OrbStack for macOS)
 
 2. **Configure Laravel Pint**:
    - Enable Laravel Pint inspection in PHP Quality Tools
    - Set configuration path: `/opt/project/src/vendor/vlfesko/laravel-pint-config/pint.json`
    - Select preset: `laravel`
-   - Last updated: August 2025
+   - Last updated: October 2025
 
 ## Troubleshooting
 
