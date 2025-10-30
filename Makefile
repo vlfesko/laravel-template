@@ -101,6 +101,22 @@ artisan:
 composer:
 	$(DOCKER_COMPOSE) exec app composer $(filter-out $@,$(MAKECMDGOALS))
 
+## refresh	:	Reset database with migrations and seeders.
+refresh:
+	$(DOCKER_COMPOSE) exec app php artisan migrate:fresh --seed
+
+## test	:	Run application tests using Pest/PHPUnit.
+##		You can optionally pass arguments to filter tests
+##		test	: Run all tests.
+##		test tests/Feature	: Run only Feature tests.
+##		test --filter=ApiKeyGenerateCommandTest	: Run specific test class.
+test:
+	$(DOCKER_COMPOSE) exec app php artisan test $(filter-out $@,$(MAKECMDGOALS))
+
+## apidocs	:	Generate API docs.
+apidocs:
+	$(DOCKER_COMPOSE) exec -e APP_URL=$(APP_URL_PRODUCTION) -e APP_API_URL=$(APP_API_URL_PRODUCTION) app php artisan scribe:generate
+
 ## init	:	Initialize the project by setting up .env files.
 init:
 	@if [ ! -f .env ]; then \
