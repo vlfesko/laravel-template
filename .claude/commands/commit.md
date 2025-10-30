@@ -7,6 +7,8 @@ allowed-tools: [Bash]
 
 Analyze changes in staged files, create a descriptive commit message following the project's conventions, and commit the changes.
 
+IMPORTANT: do not add unstaged files.
+
 Steps:
 1. Run `git status` to see current state
 2. Run `git diff` to analyze staged and unstaged changes

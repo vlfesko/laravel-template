@@ -1,7 +1,7 @@
 include .env.example
 -include .env
 
-.PHONY: help build pull up down start restart stop prune ps shell logs pint artisan composer init init-dev post-create
+.PHONY: help build pull up down start restart stop prune ps shell logs pint artisan composer refresh test apidocs init init-dev post-create
 
 default: up
 
