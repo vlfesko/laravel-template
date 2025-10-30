@@ -7,7 +7,7 @@ allowed-tools: [Bash]
 
 Analyze changes in staged files, create a descriptive commit message following the project's conventions, and commit the changes.
 
-IMPORTANT: do not add unstaged files.
+IMPORTANT: do not add unracked files, add only changes in tracked files.
 
 Steps:
 1. Run `git status` to see current state
