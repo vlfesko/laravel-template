@@ -39,11 +39,26 @@ apidocs:
 
 ## init	:	Initialize the project by setting up .env files.
 init: init-env
-	@if [ -d src ] &&  [ ! -f src/.env ]; then \
-		echo "Creating src/.env file from .env.example..."; \
-		cp src/.env.example src/.env; \
+	@if [ -d src ]; then \
+		if [ ! -f src/.env ]; then \
+			echo "Creating src/.env file from .env.example..."; \
+			cp src/.env.example src/.env; \
+		else \
+			echo "src/.env file already exists. Keeping file and updating DB settings..."; \
+		fi; \
+		echo "Updating database values in src/.env from root .env..."; \
+		sed -i.bak \
+			-e 's|^APP_URL=.*|APP_URL=$${X_APP_URL}|' \
+			-e 's|^APP_TIMEZONE=.*|APP_TIMEZONE=$${X_APP_TIMEZONE}|' \
+			-e 's|^DB_HOST=.*|DB_HOST=$${X_DB_HOST}|' \
+			-e 's|^DB_DATABASE=.*|DB_DATABASE=$${X_DB_DATABASE}|' \
+			-e 's|^DB_USERNAME=.*|DB_USERNAME=$${X_DB_USERNAME}|' \
+			-e 's|^DB_PASSWORD=.*|DB_PASSWORD=$${X_DB_PASSWORD}|' \
+			-e 's|^REDIS_HOST=.*|REDIS_HOST=$${X_REDIS_HOST}|' \
+			src/.env; \
+		rm -f src/.env.bak; \
 	else \
-		echo "src/.env file already exists or src folder is missing. Skipping..."; \
+		echo "src folder is missing. Skipping src/.env setup."; \
 	fi
 
 ## post-create	:	Run post-create project commands.
