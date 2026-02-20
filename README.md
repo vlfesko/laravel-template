@@ -14,28 +14,32 @@ This project is a PHP application built using the Laravel framework. It utilizes
 For experienced developers:
 
 ```bash
-# 1. Clone and setup
+# 1. Clone and initialize env files
 git clone <repository-url>
 cd laravel-template
 make init
 
 # 2. Configure environment
-# Edit PROJECT_NAME, PHP_TAG and any other values in .env
+# Edit PROJECT_NAME, X_APP_DOMAIN, PHP_TAG, NODE_TAG and DB values in .env
 
 # 3. Start services
 make build && make up
 
-# 4. Setup Laravel (if fresh install)
+# 4. If src/ is missing, create Laravel app
 make shell
 composer global require laravel/installer
 laravel new my-app --livewire --pest --force --database mariadb --no-interaction
 mv my-app/* . && mv my-app/.* . && rm -rf my-app/
 exit
 
-# 5. Install additional packages
+# 5. Install app dependencies
+make composer install
+make composer setup
+
+# 6. Install additional packages
 make post-create
 
-# 6. Configure Vite and restart node
+# 7. Restart node after Vite/HMR config changes
 make restart node
 ```
 
@@ -60,7 +64,7 @@ You must have installed on your system:
 
 ### Setup Process
 
-**Update Vite configuration** in `src/vite.config.js` for proper hot module reload support:
+**Vite HMR host** in `src/vite.config.js` should match your domain (`X_APP_DOMAIN` from `.env`):
    ```javascript
    import { defineConfig } from 'vite';
    import laravel from 'laravel-vite-plugin';
@@ -83,7 +87,7 @@ You must have installed on your system:
    
        if (command !== 'build') {
            config.server.hmr = {
-               host: "my-app.docker.localhost"  // Replace with your APP_DOMAIN
+               host: "my-app.docker.localhost"  // Replace with your X_APP_DOMAIN
            };
        }
    
@@ -93,11 +97,11 @@ You must have installed on your system:
 
 **Restart node container and verify:**
    ```bash
-   exit  # Exit app container shell
+   # If currently inside a container shell, exit first
    make restart node
    make logs node
    ```
-   Open your browser at the `APP_URL` displayed in the container.
+   Open your browser at `https://<your X_APP_DOMAIN>` (or `X_APP_URL`).
 
 ## Available Commands
 
@@ -122,15 +126,20 @@ make ps                    # List running containers
 
 ### Development Tools
 ```bash
-make shell                 # Access app container via bash
-make shell <service>       # Access specific container via bash
+make shell                 # Access app container shell (sh)
+make shell <service>       # Access specific container shell (sh)
 make logs                  # View all container logs
 make logs <service>        # View specific service logs
 make artisan <command>     # Run Laravel Artisan commands
 make composer <command>    # Run Composer commands
 make pint                  # Run Laravel Pint to format code
+make refresh               # Recreate DB and seeders
 make post-create           # Install additional dev packages
 make test                  # Run Laravel test suite
+make tail-logs             # Tail Laravel logs from src/storage/logs
+make apidocs               # Generate API docs (if scribe is installed)
+make migrate               # Run migrate flow from Makefile.project.mk
+make deploy                # Run deployment flow from Makefile.project.mk
 ```
 
 ## Troubleshooting
@@ -155,6 +164,8 @@ make restart <service-name>
 # Complete restart
 make down && make up
 ```
+
+Common service names: `app`, `web`, `db`, `db_test`, `redis`, `node`, `worker`, `cron`, `pma`, `mailpit`.
 
 ### Log Files
 
