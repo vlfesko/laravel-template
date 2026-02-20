@@ -1,0 +1,54 @@
+services:
+  db:
+    restart: unless-stopped
+    networks:
+      - default
+      - proxy
+
+  worker:
+    restart: unless-stopped
+    scale: 2
+    command: php artisan queue:listen
+
+  node:
+    restart: unless-stopped
+    command: sh -c 'npm install && npm run build && sleep infinity'
+
+  web:
+    restart: unless-stopped
+    networks:
+      - default
+      - proxy
+    labels:
+      - "traefik.enable=true"
+
+      # Service
+      - "traefik.http.services.${PROJECT_NAME}-web.loadbalancer.server.port=80"
+
+      # HTTPS
+      - "traefik.http.routers.${PROJECT_NAME}-web-https.rule=Header(`X-Traefik-Host`, `${X_TRAEFIK_HOST_WEB}`)"
+      - "traefik.http.routers.${PROJECT_NAME}-web-https.entrypoints=websecure"
+      - "traefik.http.routers.${PROJECT_NAME}-web-https.service=${PROJECT_NAME}-web"
+      - "traefik.http.routers.${PROJECT_NAME}-web-https.tls=true"
+
+  pma:
+    restart: unless-stopped
+    networks:
+      - default
+      - proxy
+    labels:
+      - "traefik.enable=true"
+
+      # Service
+      - "traefik.http.services.${COMPOSE_PROJECT_NAME}-pma.loadbalancer.server.port=80"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}-pma.rule=Header(`X-Traefik-Host`, `${X_TRAEFIK_HOST_PMA}`)"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}-pma.entrypoints=websecure"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}-pma.tls=true"
+
+      # Basic Auth Middleware
+      - "traefik.http.middlewares.${COMPOSE_PROJECT_NAME}-pma-auth.basicauth.users=${X_PMA_BASIC_AUTH}"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}-pma.middlewares=${COMPOSE_PROJECT_NAME}-pma-auth@docker"
+
+networks:
+  proxy:
+    external: true

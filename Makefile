@@ -1,21 +1,36 @@
 include .env.example
 -include .env
+-include Makefile.project.mk
 
-.PHONY: help build pull up down start restart stop prune ps shell logs pint artisan composer refresh test apidocs init init-dev post-create
+.PHONY: help build pull up down start restart stop prune ps shell logs init-env
 
 default: up
 
 SHELL := /bin/bash
 UNAME := $(shell uname -sm)
-DOCKER_COMPOSE := docker compose
-COMPOSE_FILES := -f compose.yml -f compose.$(COMPOSE_ENV).yml
-DOCKER_COMPOSE_W_FILES = $(DOCKER_COMPOSE) $(COMPOSE_FILES)
-PINT_FILE := vendor/vlfesko/laravel-pint-config/pint.json
+DEFAULT_CONTAINER := $(or $(MAKEFILE_DEFAULT_CONTAINER),app)
+ifneq ($(shell which docker-compose),)
+    DOCKER_COMPOSE := docker-compose
+else
+    DOCKER_COMPOSE := docker compose
+endif
+COMPOSE_FILES := -f compose.yaml
+ifneq ($(wildcard compose.$(COMPOSE_ENV).yaml),)
+    COMPOSE_FILES += -f compose.$(COMPOSE_ENV).yaml
+endif
 
 ifeq ($(UNAME),Darwin arm64)
-    COMPOSE_FILES += -f compose.$(COMPOSE_ENV).arm64v8.yml
+    ifneq ($(wildcard compose.$(COMPOSE_ENV).arm64v8.yaml),)
+        COMPOSE_FILES += -f compose.$(COMPOSE_ENV).arm64v8.yaml
+    endif
     export DOCKER_DEFAULT_PLATFORM=linux/arm64/v8
 endif
+
+ifneq ($(wildcard compose.override.yaml),)
+    COMPOSE_FILES += -f compose.override.yaml
+endif
+
+DOCKER_COMPOSE_W_FILES = $(DOCKER_COMPOSE) $(COMPOSE_FILES)
 
 ## help	:	Print commands help.
 help : Makefile
@@ -71,97 +86,25 @@ prune:
 ps:
 	@docker ps --filter name='$(PROJECT_NAME)*'
 
-## shell	:	Access `app` container via shell.
+## shell	:	Access `$(DEFAULT_CONTAINER)` container via shell.
 ##		You can optionally pass an argument with a service name to open a shell on the specified container
 shell:
-	$(DOCKER_COMPOSE) exec $(or $(filter-out $@,$(MAKECMDGOALS)), 'app') bash
+	$(DOCKER_COMPOSE) exec $(or $(filter-out $@,$(MAKECMDGOALS)), $(DEFAULT_CONTAINER)) sh
 
 ## logs	:	View containers logs.
-##		You can optinally pass an argument with the service name to limit logs
+##		You can optionally pass an argument with the service name to limit logs
 ##		logs app	: View `app` container logs.
 ##		logs nginx app	: View `nginx` and `app` containers logs.
 logs:
 	$(DOCKER_COMPOSE) logs -f $(filter-out $@,$(MAKECMDGOALS))
 
-## pint	:	Run Laravel Pint to reformat the app code.
-pint:
-	$(DOCKER_COMPOSE) exec app php vendor/bin/pint --config $(PINT_FILE)
-
-## artisan	:	Run Laravel Artisan commands.
-##		You can pass arguments to artisan
-##		artisan migrate	: Run migrations.
-##		artisan make:model Post	: Create a Post model.
-artisan:
-	$(DOCKER_COMPOSE) exec app php artisan $(filter-out $@,$(MAKECMDGOALS))
-
-## composer	:	Run Composer commands.
-##		You can pass arguments to composer
-##		composer install	: Install dependencies.
-##		composer require spatie/laravel-ray	: Require a package.
-composer:
-	$(DOCKER_COMPOSE) exec app composer $(filter-out $@,$(MAKECMDGOALS))
-
-## refresh	:	Reset database with migrations and seeders.
-refresh:
-	$(DOCKER_COMPOSE) exec app php artisan migrate:fresh --seed
-
-## test	:	Run application tests using Pest/PHPUnit.
-##		You can optionally pass arguments to filter tests
-##		test	: Run all tests.
-##		test tests/Feature	: Run only Feature tests.
-##		test --filter=ApiKeyGenerateCommandTest	: Run specific test class.
-test:
-	$(DOCKER_COMPOSE) exec app php artisan test $(filter-out $@,$(MAKECMDGOALS))
-
-## apidocs	:	Generate API docs.
-apidocs:
-	$(DOCKER_COMPOSE) exec -e APP_URL=$(APP_URL_PRODUCTION) -e APP_API_URL=$(APP_API_URL_PRODUCTION) app php artisan scribe:generate
-
-## init	:	Initialize the project by setting up .env files.
-init:
+## init-env	:	Initialize the project environment
+init-env:
 	@if [ ! -f .env ]; then \
 		echo "Creating .env file from .env.example..."; \
 		cp .env.example .env; \
 	else \
 		echo ".env file already exists. Skipping..."; \
-	fi
-	@if [ -d src ] &&  [ ! -f src/.env ]; then \
-		echo "Creating src/.env file from .env.example..."; \
-		cp src/.env.example src/.env; \
-	else \
-		echo "src/.env file already exists or src folder is missing. Skipping..."; \
-	fi
-
-## init	:	Initialize the project by setting up .env, installing mkcert, and generating certificates.
-init-dev: init
-	@if [ ! -f /usr/local/bin/mkcert ]; then \
-		echo "Installing mkcert..."; \
-		./docker/certs/bin/install-mkcert; \
-	else \
-		echo "mkcert already installed. Skipping..."; \
-	fi
-	@if [ ! -f ./docker/certs/conf/certs/server.crt ]; then \
-		echo "Generating certificates..."; \
-		cd ./docker/certs/; ./bin/generate-certificates; cd -; \
-	else \
-		echo "Certificates already exist. Skipping..."; \
-	fi
-
-## post-create	:	Run post-create project commands.
-post-create:
-	$(DOCKER_COMPOSE) exec app composer require -W --dev \
- 		laravel-shift/blueprint \
- 		jasonmccreary/laravel-test-assertions \
- 		larastan/larastan:^3.0 \
- 		barryvdh/laravel-debugbar \
- 		vlfesko/laravel-pint-config
-	$(DOCKER_COMPOSE) exec app composer require spatie/laravel-ray
-	$(DOCKER_COMPOSE) exec app php artisan ray:publish-config --docker
-	@if [ ! -f src/phpstan.neon.dist ]; then \
-		echo "Copy larastan config..."; \
-		cp init/phpstan.neon.dist src; \
-		echo "Copy blueprint stubs..."; \
-		cp -r init/stubs src; \
 	fi
 
 # https://stackoverflow.com/a/6273809/1826109

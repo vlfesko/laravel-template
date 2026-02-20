@@ -1,0 +1,8 @@
+services:
+  db:
+    networks:
+      - infra_n8n
+
+networks:
+  infra_n8n:
+    external: true

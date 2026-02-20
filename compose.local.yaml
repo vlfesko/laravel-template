@@ -1,0 +1,66 @@
+services:
+  db_test:
+    image: "wodby/mariadb:${MARIADB_TAG}"
+    container_name: "${PROJECT_NAME}-db-test"
+    stop_grace_period: 30s
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: test
+      MYSQL_USER: "${X_DB_USERNAME}"
+      MYSQL_PASSWORD: "${X_DB_PASSWORD}"
+    tmpfs:
+      - /var/lib/mysql:rw,noexec,nosuid,size=512m
+
+  app:
+    environment:
+      MSMTP_HOST: mailpit
+      MSMTP_PORT: 1025
+      PHP_SENDMAIL_PATH: "/usr/bin/msmtp -C /etc/msmtprc -t --read-envelope-from"
+
+  cron:
+    environment:
+      MSMTP_HOST: mailpit
+      MSMTP_PORT: 1025
+      PHP_SENDMAIL_PATH: "/usr/bin/msmtp -C /etc/msmtprc -t --read-envelope-from"
+
+  node:
+    ports:
+      - "5173:5173"
+
+  web:
+    labels:
+      - "traefik.enable=true"
+      # Serve web over http"
+      - "traefik.http.routers.${PROJECT_NAME}-web-http.rule=Host(`${X_APP_DOMAIN}`)"
+      - "traefik.http.routers.$PROJECT_NAME-web-http.entrypoints=web"
+      # Serve web over https
+      - "traefik.http.routers.$PROJECT_NAME-web-https.rule=Host(`${X_APP_DOMAIN}`)"
+      - "traefik.http.routers.$PROJECT_NAME-web-https.entrypoints=websecure"
+      - "traefik.http.routers.$PROJECT_NAME-web-https.tls=true"
+
+  mailpit:
+    image: axllent/mailpit
+    container_name: "${PROJECT_NAME}-mailpit"
+    labels:
+      - "traefik.enable=true"
+
+      # Service
+      - "traefik.http.services.${PROJECT_NAME}-mailpit.loadbalancer.server.port=8025"
+
+      # HTTPS
+      - "traefik.http.routers.${PROJECT_NAME}-mailpit-http.rule=Host(`mailpit.${X_APP_DOMAIN}`)"
+      - "traefik.http.routers.${PROJECT_NAME}-mailpit-http.entrypoints=web"
+      - "traefik.http.routers.$}PROJECT_NAME}-web-https.tls=true"
+
+  pma:
+    depends_on:
+      - db_test
+    environment:
+      PMA_HOSTS: db,db_test
+      PMA_USER: "${X_DB_USERNAME}"
+      PMA_PASSWORD: "${X_DB_PASSWORD}"
+    labels:
+      - "traefik.enable=true"
+      # Serve web over http
+      - "traefik.http.routers.${PROJECT_NAME}-pma-http.rule=Host(`pma.${X_APP_DOMAIN}`)"
+      - "traefik.http.routers.$PROJECT_NAME-pma-http.entrypoints=web"
