@@ -89,7 +89,7 @@ ps:
 ## shell	:	Access `$(DEFAULT_CONTAINER)` container via shell.
 ##		You can optionally pass an argument with a service name to open a shell on the specified container
 shell:
-	$(DOCKER_COMPOSE) exec $(or $(filter-out $@,$(MAKECMDGOALS)), $(DEFAULT_CONTAINER)) sh
+	$(DOCKER_COMPOSE) exec $(or $(filter-out $@,$(MAKECMDGOALS)), $(DEFAULT_CONTAINER)) $(SHELL)
 
 ## logs	:	View containers logs.
 ##		You can optionally pass an argument with the service name to limit logs

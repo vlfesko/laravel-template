@@ -30,15 +30,14 @@ make build && make up
 # my-app is a temporary app name
 make shell
 composer global require laravel/installer
-laravel new my-app --livewire --pest --force --database mariadb --no-interaction
+DB_CONNECTION=mariadb DB_HOST=$X_DB_HOST DB_DATABASE=$X_DB_DATABASE \
+  DB_USERNAME=$X_DB_USERNAME DB_PASSWORD=$X_DB_PASSWORD \
+  laravel new my-app --livewire --pest --force --database mariadb --no-interaction
 mv my-app/* . && mv my-app/.* . && rm -rf my-app/
 exit
 
 # Update Laravel configuration
 make init
-
-# Install app database
-make composer setup
 
 # Install additional packages
 make post-create

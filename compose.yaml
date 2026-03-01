@@ -72,7 +72,9 @@ services:
       NGINX_VHOST_PRESET: laravel
       NGINX_SERVER_ROOT: /var/www/html/public
     volumes:
+      - ./docker/conf/nginx/laravel.conf.tmpl:/etc/gotpl/presets/laravel.conf.tmpl
       - ./src:/var/www/html:cached
+
 
   redis:
     image: "redis:${REDIS_TAG}"
