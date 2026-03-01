@@ -14,36 +14,37 @@ This project is a PHP application built using the Laravel framework. It utilizes
 For experienced developers:
 
 ```bash
-# 1. Clone and initialize env files
+# Clone and initialize env files
 git clone <repository-url>
 cd laravel-template
 make init
 
-# 2. Configure environment
-# Edit PROJECT_NAME, X_APP_DOMAIN, PHP_TAG, NODE_TAG and DB values in .env
+# Configure environment
+# Edit PROJECT_NAME to set project codename
+# Edit X_APP_DOMAIN, PHP_TAG, NODE_TAG and DB values in .env if necessary
 
-# 3. Start services
+# Start services
 make build && make up
 
-# 4. If src/ is missing, create Laravel app
+# If creating new Laravel app, install it
+# my-app is a temporary app name
 make shell
 composer global require laravel/installer
 laravel new my-app --livewire --pest --force --database mariadb --no-interaction
 mv my-app/* . && mv my-app/.* . && rm -rf my-app/
 exit
 
-# 5. Install app dependencies
-make composer install
+# Update Laravel configuration
+make init
+
+# Install app database
 make composer setup
 
-# 6. Install additional packages
+# Install additional packages
 make post-create
-
-# 7. Restart node after Vite/HMR config changes
-make restart node
 ```
 
-Access your application at the `X_APP_URL` configured in your `.env` file.
+Update `vite.config.js` and restart node.
 
 ## Getting Started
 

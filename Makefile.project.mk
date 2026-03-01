@@ -1,4 +1,4 @@
-.PHONY: pint artisan composer refresh test apidocs init post-create tail-logs deploy migrate
+.PHONY: pint artisan composer refresh test apidocs init post-create cleanup tail-logs deploy migrate
 
 PINT_FILE := vendor/vlfesko/laravel-pint-config/pint.json
 
@@ -76,6 +76,15 @@ post-create:
 		cp init/phpstan.neon.dist src; \
 		echo "Copy blueprint stubs..."; \
 		cp -r init/stubs src; \
+	fi
+
+## cleanup	:	Remove template repository metadata.
+cleanup:
+	@if [ -d .git ]; then \
+		echo "Removing template git repository at .git..."; \
+		rm -rf .git; \
+	else \
+		echo ".git folder is not present. Skipping cleanup."; \
 	fi
 
 ## tail-logs	:	Follow all Laravel log files.
